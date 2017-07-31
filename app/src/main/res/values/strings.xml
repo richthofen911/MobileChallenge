@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">FastRate</string>
+
+    <string name="input_field_hint">Base Currency Value Here</string>
+</resources>
