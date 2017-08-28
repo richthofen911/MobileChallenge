@@ -6,4 +6,6 @@ package net.callofdroidy.fastrate.utils;
 
 public interface Constants {
     String BASE_URL = "http://api.fixer.io";
+    String COL_QUOTE_CURRENCY = "QuoteCurrency";
+    String COL_QUOTE_VALUE = "QuoteValue";
 }

@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/FastRate.iml" filepath="$PROJECT_DIR$/FastRate.iml" />
+      <module fileurl="file://$PROJECT_DIR$/MobileChallenge.iml" filepath="$PROJECT_DIR$/MobileChallenge.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
