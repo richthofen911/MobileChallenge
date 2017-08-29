@@ -1,7 +1,6 @@
 package net.callofdroidy.fastrate.webapi;
 
-import okhttp3.ResponseBody;
-import retrofit2.Call;
+import io.reactivex.Observable;
 import retrofit2.http.GET;
 
 /**
@@ -10,5 +9,5 @@ import retrofit2.http.GET;
 
 public interface CurrencyRateService {
     @GET("/latest")
-    Call<String> getLatestRates();
+    Observable<String> getLatestRates();
 }

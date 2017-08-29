@@ -17,9 +17,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 import static net.callofdroidy.fastrate.utils.Constants.COL_QUOTE_CURRENCY;
 import static net.callofdroidy.fastrate.utils.Constants.COL_QUOTE_VALUE;
@@ -46,29 +47,38 @@ public class PresenterMain {
         long lastUpdateTime = viewActMain.getViewContext().getSharedPreferences("info", 0).getLong("last_update_time", 0);
         // get rates from server when more than 30 minutes
         if(System.currentTimeMillis() - lastUpdateTime > 30 * 1000){
-            ServiceGenerator.createService(CurrencyRateService.class).getLatestRates().enqueue(new Callback<String>() {
-                @Override
-                public void onResponse(Call<String> call, Response<String> response) {
-                    try{
-                        JSONObject responseInJson = new JSONObject(response.body());
-                        JSONObject rates = responseInJson.getJSONObject("rates");
-                        rates.put("EUR", 1.0);
-                        viewActMain.getViewContext().getSharedPreferences("info", 0).edit()
-                                .putString("rates", rates.toString())
-                                .putLong("last_update_time", System.currentTimeMillis())
-                                .apply();
-                        getRatesCallback.onGetRates(rates);
-                    }catch (JSONException e){
-                        Log.e(TAG, "onResponse: " + e.toString());
-                        viewActMain.showErrMsg(e.toString());
-                    }
-                }
+            CurrencyRateService rateService = ServiceGenerator.createService(CurrencyRateService.class);
+            rateService.getLatestRates()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<String>(){
+                        @Override
+                        public void onSubscribe(Disposable d){
 
-                @Override
-                public void onFailure(Call<String> call, Throwable t) {
-                    viewActMain.showErrMsg(t.getMessage());
-                }
-            });
+                        }
+                        @Override
+                        public void onNext(String s){
+                            try{
+                                JSONObject responseInJson = new JSONObject(s);
+                                JSONObject rates = responseInJson.getJSONObject("rates");
+                                rates.put("EUR", 1.0);
+                                viewActMain.getViewContext().getSharedPreferences("info", 0).edit()
+                                        .putString("rates", rates.toString())
+                                        .putLong("last_update_time", System.currentTimeMillis())
+                                        .apply();
+                                getRatesCallback.onGetRates(rates);
+                            }catch (JSONException e){
+                                Log.e(TAG, "onResponse: " + e.toString());
+                                viewActMain.showErrMsg(e.toString());
+                            }
+                        }
+                        @Override
+                        public void onError(Throwable t){
+                            viewActMain.showErrMsg(t.getMessage());
+                        }
+                        @Override
+                        public void onComplete(){}
+                    });
         }else {
             // get local saved rates
             try{
